@@ -23,12 +23,14 @@ async function dirWatcher() {
           fs.watch(dir + "/" + file, (event, file) => {
             console.log(`${file} is ${event}ed`);
             console.log("node ", settings.nodeFile);
-
-
-            // es werden alle files eingelesen muss nur mehr dieses childprocess lösen
-            
-            
-            childProcess.exec(`node ${settings.nodeFile}`);
+            childProcess.exec(
+              `node ${settings.nodeFile}`,
+              (error, out, err) => {
+                if (error) console.log(error);
+                console.log(out);
+                console.log(err);
+              }
+            );
           });
         }
       }
