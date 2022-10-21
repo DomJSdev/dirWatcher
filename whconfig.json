@@ -1,5 +1,5 @@
 {
-  "dir": "./test",
+  "dir": "./",
   "nodeFile": "index",
-  "includes": ["txt"]
+  "includes": ["md","txt"]
 }

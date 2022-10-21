@@ -1,31 +1,36 @@
 const fs = require("fs");
 const childProcess = require("child_process");
 
-async function dirWatcher() {
-  function validateSettings(object) {
-    if (object.dir.length === 0) return;
-  }
+const ignorefiles = ["node_modules"];
 
+async function dirWatcher() {
   const configConfig = await fs.promises.readFile("./whconfig.json");
   const settings = JSON.parse(configConfig);
-  console.log(settings);
+
   if (settings.dir.length === 0) return;
-  if (settings.nodefile.length === 0) return;
+  if (settings.nodeFile.length === 0) return;
   if (settings.includes.length === 0) settings.includes.push("js");
 
   async function setWatcher(dir, ends, nodefile) {
     const dirContent = await fs.promises.readdir(dir);
     dirContent.forEach((file) => {
-      /*
-        ist das zuläsig?
-        file.split(".")[1].find(...ends
-        */
-      if (file.split(".")[1].find(...ends)) {
-        fs.watch(dir + "/" + file, (event, file) => {
-          console.log("event: ", event);
-          console.log("file: ", file);
-          childProcess.exec("node", [nodefile]);
-        });
+      if (ignorefiles.indexOf(file) >= 0) {
+      } else if (file.indexOf(".") < 0) {
+        setWatcher(`${dir}/${file}`, settings.includes, settings.nodefile);
+      } else {
+        if (ends.indexOf(file.split(".")[1]) >= 0) {
+          //console.log(file,' werde ich überwachen')
+          fs.watch(dir + "/" + file, (event, file) => {
+            console.log(`${file} is ${event}ed`);
+            console.log("node ", settings.nodeFile);
+
+
+            // es werden alle files eingelesen muss nur mehr dieses childprocess lösen
+            
+            
+            childProcess.exec(`node ${settings.nodeFile}`);
+          });
+        }
       }
     });
   }
@@ -33,4 +38,3 @@ async function dirWatcher() {
 }
 
 dirWatcher();
-//module.exports = { dirWatcher };
